@@ -1,0 +1,65 @@
+---
+title: ""
+author: ""
+date: ""
+output: html_document
+runtime: shiny
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(shiny)
+library(tidyverse)
+library(MASS)
+
+data("Boston")
+summary(Boston)
+```
+
+
+
+```{r, echo = FALSE}
+# Define UI for application that plots features of movies 
+ui <- fluidPage(
+  
+  # Sidebar layout with a input and output definitions 
+  sidebarLayout(
+    
+    # Inputs
+    sidebarPanel(
+      
+      # Select variable for y-axis
+      selectInput(inputId = "y", 
+                  label = "Y-axis:",
+                  choices = "medv", 
+                  selected = "medv"),
+      # Select variable for x-axis
+      selectInput(inputId = "x", 
+                  label = "X-axis:",
+                  choices = c("crim", "indus", "rm", "tax"), 
+                  selected = "rm")
+    ),
+    
+    # Outputs
+    mainPanel(
+      plotOutput(outputId = "scatterplot")
+    )
+  )
+)
+
+# Define server function required to create the scatterplot
+server <- function(input, output) {
+
+  # Create scatterplot object the plotOutput function is expecting
+  output$scatterplot <- renderPlot({
+    ggplot(data = Boston, aes_string(x = input$x, y = input$y)) +
+      geom_point() +
+      geom_smooth(method = "lm")
+  })
+}
+
+
+# Create a Shiny app object
+shinyApp(ui = ui, server = server)
+```
+
